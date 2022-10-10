@@ -4,61 +4,15 @@ import { useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-export default function PageTwo({ chooseMovie, setChooseMovie }) {
-    const params = useParams();
-    useEffect(() => {
-        const Url = `https://mock-api.driven.com.br/api/v5/cineflex/movies/${params.id}/showtimes`;
-        const promisse = axios.get(Url);
-        promisse.then((movie) => {
-            setChooseMovie(movie.data);
-        });
-        promisse.catch((erro) => {
-            alert(erro.response.data);
-        });
-    }, []
-    );
-
-    if (chooseMovie !== null) {
-        return (
-            <div>
-                <Chose>
-                    <p>Selecione o horário</p>
-                </Chose>
-                {chooseMovie.days.map((info) => {
-                    return (
-                        <div>
-                            <Dia>
-                                {info.weekday} - {info.date}
-                            </Dia>
-                            <Horario>
-                                {info.showtimes.map((inf) => (
-                                    <Link to={`/sessao/${inf.id}`}>
-                                        <button>{inf.name}</button>
-                                    </Link>
-                                ))}
-                            </Horario>
-                        </div>
-                    );
-                })}
-                <Footer>
-                    <img src={chooseMovie.posterURL} />
-                    <p>{chooseMovie.title}</p>
-                </Footer>
-            </div>
-        );
-    }
-
-    return <></>;
-}
-
-const Dia = styled.p`
+const Day = styled.p`
   font-family: "Roboto", sans-serif;
   font-weight: 400;
   font-size: 20px;
   color: #293845;
   margin: auto;
 `;
-const Horario = styled.div`
+
+const Hour = styled.div`
   display: flex;
   justify-content: center;
   button {
@@ -75,10 +29,11 @@ const Horario = styled.div`
     margin-right: 20px;
     margin-bottom: 23px;
     margin-top: 23px;
+    cursor: pointer;
   }
 `;
 
-const Chose = styled.div`
+const Choose = styled.div`
   background-color: #ffffff;
   width: 100vw;
   height: 110px;
@@ -92,6 +47,7 @@ const Chose = styled.div`
     color: #293845;
   }
 `;
+
 const Footer = styled.div`
   background-color: #dfe6ed;
   width: 100vw;
@@ -115,3 +71,47 @@ const Footer = styled.div`
     margin-left: 20px;
   }
 `;
+
+export default function PageTwo({ filmeEscolhido, setFilmeEscolhido }) {
+  const params = useParams();
+  useEffect(() => {
+    const Url = `https://mock-api.driven.com.br/api/v5/cineflex/movies/${params.id}/showtimes`;
+    const promisse = axios.get(Url);
+    promisse.then((movie) => {
+      setFilmeEscolhido(movie.data);
+    });
+    promisse.catch((erro) => {
+      alert(erro.response.data);
+    });
+  }, [setFilmeEscolhido, params]);
+  if (filmeEscolhido !== null) {
+    return (
+      <>
+        <Choose>
+          <p>Selecione o horário</p>
+        </Choose>
+        {filmeEscolhido.days.map((info) => {
+          return (
+            <>
+              <Day key={info.id}>
+                {info.weekday} - {info.date}
+              </Day>
+              <Hour>
+                {info.showtimes.map((inf) => (
+                  <Link key={inf.id} to={`/sessao/${inf.id}`}>
+                    <button>{inf.name}</button>
+                  </Link>
+                ))}
+              </Hour>
+            </>
+          );
+        })}
+        <Footer><img src={filmeEscolhido.posterURL} alt="filmeEscolhido" /><p>{filmeEscolhido.title}</p></Footer>
+      </>
+    );
+  }
+
+  return <></>;
+}
+
+
